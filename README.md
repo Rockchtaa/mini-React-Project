@@ -1,5 +1,27 @@
 <<<<<<< HEAD
 # mini-React-Project
+## Features
+
+- **Product Listing**: Displays a list of products with details such as title, price, description, category, image, and rating.
+- **Search Functionality**: Users can search for products by their title.
+- **Category Filter**: Users can filter products by category using a dropdown menu.
+- **Responsive Design**: The application is styled using Bootstrap to ensure responsiveness and a clean, modern look.
+
+## Technologies Used
+
+- **React**: A JavaScript library for building user interfaces.
+- **Bootstrap**: A CSS framework for building responsive, mobile-first websites.
+- **Fake Store API**: A public API used to fetch product data and categories.
+
+## Getting Started
+
+### Prerequisites
+
+Make sure you have the following installed on your local development environment:
+
+- Node.js (v14 or later)
+- npm (v6 or later)
+
 =======
 # Getting Started with Create React App
 
