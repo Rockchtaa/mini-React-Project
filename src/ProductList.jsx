@@ -1,30 +1,45 @@
-import { useEffect, useState } from "react";
+import { useEffect,useReducer, useState } from "react";
 import Product from "./Product";
 
+import {productReducer, initialState} from './ProductReducer';
+
 export default function ProductList() {
-  const [productList, setProductList] = useState([]);
-  const [productSearch, setProductSearch] = useState([]);
-  const [category, setCategory] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
+  // const [productList, setProductList] = useState([]);
+  // const [productSearch, setProductSearch] = useState([]);
+  // const [category, setCategory] = useState([]);
+  // const [selectedCategory, setSelectedCategory] = useState('');
+
+  const [state, dispatch] = useReducer(productReducer, initialState);
+  const { productList, productSearch, category, selectedCategory, loading, error } = state;
+
 
   // Fetch products
   const getProducts = () => {
     fetch("https://fakestoreapi.com/products")
       .then((response) => response.json())
-      .then((response) => setProductList(response));
+      .then((response) => dispatch({ type: "SET_PRODUCTS", payload: response }))
+      .catch((error) => dispatch({ type: "SET_ERROR", payload: error.message }));
+
   };
 
   // Fetch categories
   const getProductsCategories = () => {
     fetch("https://fakestoreapi.com/products/categories")
       .then((response) => response.json())
-      .then((response) => setCategory(response));
+      .then((response) => dispatch({ type: "SET_CATEGORIES", payload: response }))
+      .catch((error) => dispatch({ type: "SET_ERROR", payload: error.message }));
   };
 
-  // Display products
+  // Dislpay products
   const displayProducts = () => {
+    // const ProductsTemp = productList.filter((product) => {
+    //   const matchesSearch = product.title.includes(productSearch);
+    //   const matchesCategory = selectedCategory === '' || product.category === selectedCategory;
+    //   return matchesSearch && matchesCategory;
+    // });
+
     const ProductsTemp = productList.filter((product) => {
-      const matchesSearch = product.title.includes(productSearch);
+      const matchesSearch = product.title.toLowerCase().includes(productSearch.toLowerCase()); // in case the user enter the letters majuscule
       const matchesCategory = selectedCategory === '' || product.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
@@ -37,18 +52,27 @@ export default function ProductList() {
   const SearchProducts = (e) => {
     e.preventDefault();
     const searchInput = document.querySelector("#search").value;
-    setProductSearch(searchInput);
+    dispatch({ type: "SET_SEARCH", payload: searchInput });
   };
 
   const handleCategoryChange = (e) => {
-    setSelectedCategory(e.target.value);
+    dispatch({ type: "SET_SELECTED_CATEGORY", payload: e.target.value });
   };
+
+
 
   useEffect(() => {
     getProducts();
     getProductsCategories();
   }, []);
+  
+  if (loading) {
+    return <div className="text-center">Loading...</div>;
+  }
 
+  if (error) {
+    return <div className="text-center text-danger">Error: {error}</div>;
+  }
   return (
     <div className="container my-4">
       <h1 className="text-center mb-4">List of Products</h1>
@@ -73,11 +97,11 @@ export default function ProductList() {
 
           <select
             className="form-select"
-            value={selectedCategory}
+            value={state.selectedCategory}
             onChange={handleCategoryChange}
           >
             <option value="">All Categories</option>
-            {category.map((cat, index) => (
+            {state.category.map((cat, index) => (
               <option key={index} value={cat}>
                 {cat.charAt(0).toUpperCase() + cat.slice(1)}
               </option>
